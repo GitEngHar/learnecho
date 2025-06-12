@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
@@ -27,12 +28,32 @@ func save(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	//e.Use(middleware.Logger())
-	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
-		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	skipper := func(c echo.Context) bool {
+		// Skip health check endpoint
+		return c.Request().URL.Path == "/health"
+	}
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogStatus: true,
+		LogURI:    true,
+		Skipper:   skipper,
+		BeforeNextFunc: func(c echo.Context) {
+			c.Set("customValueFromContext", 42)
+		},
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			value, _ := c.Get("customValueFromContext").(int)
+			fmt.Printf("REQUEST: uri: %v, status: %v, custom-value: %v\n", v.URI, v.Status, value)
+			return nil
+		},
 	}))
+	//e.Use(middleware.Logger())
+	//e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+	//	Format: "method=${method}, uri=${uri}, status=${status}\n",
+	//}))
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello World")
+	})
+	e.GET("/health", func(c echo.Context) error {
+		return c.String(http.StatusOK, "ok")
 	})
 	// http://localhost:1323/users/har
 	// The return string is 'har'
