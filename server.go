@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 )
 
@@ -23,8 +24,10 @@ func save(c echo.Context) error {
 	email := c.FormValue("email")
 	return c.String(http.StatusOK, "name: "+name+", email: "+email)
 }
+
 func main() {
 	e := echo.New()
+	e.Use(middleware.Logger())
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello World")
 	})
