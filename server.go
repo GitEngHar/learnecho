@@ -27,7 +27,10 @@ func save(c echo.Context) error {
 
 func main() {
 	e := echo.New()
-	e.Use(middleware.Logger())
+	//e.Use(middleware.Logger())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello World")
 	})
