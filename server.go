@@ -21,6 +21,27 @@ func show(c echo.Context) error {
 	return c.String(http.StatusOK, "team:"+team+", member:"+member)
 }
 
+func middleWare(c echo.Context) error {
+	ctx := c.Request().Context()
+	req := c.Request().WithContext(ctx) //コンテキストをwrap
+	contextHandler(req)
+	return c.String(http.StatusOK, "ok")
+}
+
+func logic(ctx context.Context, data string) (string, error) {
+	return "", nil
+}
+
+func contextHandler(req *http.Request) string {
+	ctx := req.Context()
+	data := req.FormValue("data")
+	result, err := logic(ctx, data)
+	if err != nil {
+		return ""
+	}
+	return result
+}
+
 // form
 func save(c echo.Context) error {
 	name := c.FormValue("name")
@@ -89,6 +110,8 @@ func main() {
 	// http://localhost:1323/show?team=dev&member=har
 	// The return string is 'team:dev, member:har'
 	e.GET("/show", show)
+
+	e.GET("/context", middleWare)
 
 	// curl -d "name=git eng" -d "email=hoge@gmail.com" http://localhost:1323/save
 	// namegit eng, email:hoge@gmail.com
