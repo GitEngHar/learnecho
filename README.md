@@ -19,3 +19,17 @@ ____________________________________O/_______
 After run server , Redirect this [page](http://localhost:1323/).
 
 [ref](https://echo.labstack.com/docs/quick-start)
+
+### context
+
+#### bad practice
+
+run server
+```shell
+go run ./callByValue/good/request_cancel.go
+```
+
+request
+```shell
+curl localhost:9010/
+```
