@@ -19,7 +19,6 @@ func logWithRequestID(ctx context.Context, message string) {
 
 func handlerTrace(c echo.Context) error {
 	ctx := context.WithValue(c.Request().Context(), contextKey("request_id"), "abc_123")
-	defer ctx.Done()
 	logWithRequestID(ctx, "StartLogTraceHandler")
 	return c.String(http.StatusOK, "Logged with request ID")
 }
